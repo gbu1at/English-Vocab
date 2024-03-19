@@ -1,8 +1,6 @@
 from colorama import Fore, Style
-import re
 from application import Application
 import os
-
 
 
 if __name__ == "__main__":
@@ -44,7 +42,7 @@ if __name__ == "__main__":
                 print(Fore.RED + "Wrong path to file!" + Style.RESET_ALL)
                 continue
 
-            Application(FileName, FileCopyName).startApplication()
+            Application(FileName, FileCopyName).start_application()
 
         else:
             print("Wrong command")

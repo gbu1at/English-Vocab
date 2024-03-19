@@ -7,27 +7,33 @@ import os
 class Application:
     SEPARATOR = "$"
 
-    def __init__(self, FileName, FileCopyName):
-        self.FileName = FileName
-        self.FileCopyName = FileCopyName
+    def __init__(self, file_name, file_copy_name):
+        self.file_name = file_name
+        self.file_copy_name = file_copy_name
 
-    def getDataInMap(self):
-        map = dict()
-        with open(self.FileName, "r") as file:
+    def get_data_in_dictionary(self):
+        dictionary = dict()
+        with open(self.file_name, "r") as file:
             for line in file.readlines():
-                rusPhrase, englishPhrase = line.split(self.SEPARATOR)
-                englishPhrase = englishPhrase.replace("\n", "")
-                map[rusPhrase] = englishPhrase
-        return map
+                rus_phrase, english_phrase = line.split(self.SEPARATOR)
+                english_phrase = english_phrase.replace("\n", "")
+                dictionary[rus_phrase] = english_phrase
+        return dictionary
 
+    def to_translate(self, ru=False):
+        dictionary = self.get_data_in_dictionary()
 
-    def toTranslate(self):
-        map = self.getDataInMap()
+        if ru:
+            new_dictionary = dict()
+            for ru, en in dictionary.items():
+                new_dictionary[en] = ru
+            dictionary = new_dictionary
+
         flag = True
         while flag:
-            rusPhrase = random.choice(list(map))
-            answer = map[rusPhrase].lower().replace(" ", "")
-            print(f"{rusPhrase}    -    ", end="")
+            phrase = random.choice(list(dictionary))
+            translation_phrase = dictionary[phrase].lower().replace(" ", "")
+            print(f"{phrase}    -    ", end="")
             while True:
                 s = input()
                 if s == "exit":
@@ -39,65 +45,59 @@ class Application:
                 elif s == "next":
                     break
                 elif s == "?":
-                    print(f"correct answer    -    {map[rusPhrase]}")
-                    print(f"{rusPhrase}    -    ", end="")
+                    print(f"correct answer    -    {dictionary[phrase]}")
+                    print(f"{phrase}    -    ", end="")
                 else:
-                    userAnswer = s.lower().replace(" ", "")
-                    if answer != userAnswer:
+                    user_translation_phrase = s.lower().replace(" ", "")
+                    if translation_phrase != user_translation_phrase:
                         print(Fore.RED + "Wrong!" + Style.RESET_ALL)
-                        print(f"{percentageMatches(answer, userAnswer)}%")
-                        print(f"{rusPhrase}    -    ", end="")
+                        print(f"{percentageMatches(translation_phrase, user_translation_phrase)}%")
+                        print(f"{phrase}    -    ", end="")
                     else:
                         print(Fore.GREEN + "Correct!" + Style.RESET_ALL)
                         break
 
-
-
-    def copyFile(self):
-        with open(self.FileName, "r") as file:
+    def copy_file(self):
+        with open(self.file_name, "r") as file:
             data = file.readlines()
 
-        with open(self.FileCopyName, "w") as file:
+        with open(self.file_copy_name, "w") as file:
             file.writelines(data)
 
-
-    def pushWordsFile(self, map: dict):
-        with open(self.FileName, "a") as file:
-            for key, val in map.items():
+    def push_words_file(self, dictonaty: dict):
+        with open(self.file_name, "a") as file:
+            for key, val in dictonaty.items():
                 file.write(f"{key} {self.SEPARATOR} {val}\n")
 
     def add(self):
 
-        self.copyFile()
+        self.copy_file()
 
-        map = dict()
+        dictionary = dict()
         while True:
             command = input("Which command do you want use? (push/del/add/exit/clear)    -    ")
             if command == "push":
-                size = len(map)
-                self.pushWordsFile(map)
-                map = dict()
+                size = len(dictionary)
+                self.push_words_file(dictionary)
+                dictionary = dict()
                 print(f"push worked correctly. {size} phrases have been pushed")
-
 
             elif command == "del":
                 key = input()
-                del map[key]
+                del dictionary[key]
 
                 print("del worked correctly")
 
-
             elif command == "add":
-                rusWord = input("russian phrase...    ")
-                enWord = input("english phrase...    ")
+                rus_word = input("russian phrase...    ")
+                en_word = input("english phrase...    ")
 
-                map[rusWord] = enWord
+                dictionary[rus_word] = en_word
 
                 print("add worked correctly")
 
-
             elif command == "exit":
-                self.pushWordsFile(map)
+                self.push_words_file(dictionary)
 
                 print("stop worked correctly")
 
@@ -109,16 +109,14 @@ class Application:
             else:
                 print(Fore.RED + "Wrong command!" + Style.RESET_ALL)
 
-
-    def printAllWords(self):
+    def print_all_words(self):
         print("\n")
-        map = self.getDataInMap()
-        for rus, en in map.items():
+        dictionary = self.get_data_in_dictionary()
+        for rus, en in dictionary.items():
             print(f"{rus}    -    {en}")
-        print(f"{map.__len__()} phrases\n\n")
+        print(f"{dictionary.__len__()} phrases\n\n")
 
-
-    def startApplication(self):
+    def start_application(self):
         while True:
             command = input("Which command do you want use? (translate/add/exit/clear/all_words)    -    ")
             if command == "add":
@@ -126,9 +124,12 @@ class Application:
             elif command == "clear":
                 os.system("clear")
             elif command == "translate":
-                self.toTranslate()
-            elif command == "exit": break
+                par = input()
+                if par == "ru":
+                    self.to_translate(True)
+            elif command == "exit":
+                break
             elif command == "all_words":
-                self.printAllWords()
+                self.print_all_words()
             else:
                 print(Fore.RED + "Wrong command!" + Style.RESET_ALL)
