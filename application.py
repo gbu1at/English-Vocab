@@ -125,8 +125,8 @@ class Application:
                 os.system("clear")
             elif command == "translate":
                 par = input()
-                if par == "ru":
-                    self.to_translate(True)
+                flag = (par == "ru")
+                self.to_translate(flag)
             elif command == "exit":
                 break
             elif command == "all_words":
